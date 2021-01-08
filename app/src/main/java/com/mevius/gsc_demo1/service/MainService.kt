@@ -89,6 +89,23 @@ class MainService : AccessibilityService() {
             .setTicker("Notification")
             .setVibrate(longArrayOf(100, 200, 300, 400, 500, 400, 300, 200, 400))
 
+
+        val copyIntent = Intent(this, MainActivity::class.java)
+        copyIntent.action = "DISMISS"
+        copyIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        val pendingCopyIntent = PendingIntent.getActivity(
+            this, 0, copyIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        val copyAction = NotificationCompat.Action(
+            R.drawable.ic_baseline_notification_important_24,
+            "DISMISS", pendingCopyIntent
+        )
+        builder.addAction(copyAction)
+
+
+
+
         val dismissIntent = Intent(this, MainActivity::class.java)
         dismissIntent.action = "DISMISS"
         dismissIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
