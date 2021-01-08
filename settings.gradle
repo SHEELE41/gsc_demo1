@@ -1,0 +1,2 @@
+include ':app'
+rootProject.name = "gsc_demo1"

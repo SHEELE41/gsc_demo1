@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">gsc_demo1</string>
+    <string name="accessibility_service_label">MyAccessibilityService</string>
+    <string name="accessibility_service_description">MyAccessibilityService 설명입니다. 아마 설정창에 뜰 듯?</string>
+</resources>
