@@ -2,6 +2,7 @@ package com.mevius.gsc_demo1.service
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -9,16 +10,24 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.PixelFormat
 import android.os.Build
 import android.util.Log
+import android.view.*
 import android.view.accessibility.AccessibilityEvent
+import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.mevius.gsc_demo1.R
 import com.mevius.gsc_demo1.ui.MainActivity
+import kotlinx.android.synthetic.main.overlay_view.view.*
 
 class MainService : AccessibilityService() {
+    private var wm: WindowManager? = null
+    private var mView: View? = null
+
     override fun onServiceConnected() {
         super.onServiceConnected()
         Log.d("#######################", "Service Started")
@@ -28,6 +37,35 @@ class MainService : AccessibilityService() {
             feedbackType = AccessibilityServiceInfo.FEEDBACK_SPOKEN
         }
         this.serviceInfo = info
+    }
+
+    @SuppressLint("InflateParams")
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onCreate() {
+        super.onCreate()
+        val inflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        wm = getSystemService(WINDOW_SERVICE) as WindowManager
+
+        val params = WindowManager.LayoutParams(
+            /*ViewGroup.LayoutParams.MATCH_PARENT*/300,
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or    // | 쓰면 안되는 듯
+            WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
+            WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
+            PixelFormat.TRANSLUCENT
+        )
+
+        // 일단 다 !! 붙여놓고 나중에 고치지 뭐...
+
+        params.gravity = Gravity.START or Gravity.TOP
+        mView = inflater.inflate(R.layout.overlay_view, null)
+        val textView: TextView = mView!!.tv_overlay_view
+        val button: Button = mView!!.btn_overlay_view
+        button.setOnClickListener {
+            Toast.makeText(this, "BTNCLICK", Toast.LENGTH_SHORT).show()
+        }
+        wm!!.addView(mView, params)
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -89,9 +127,8 @@ class MainService : AccessibilityService() {
             .setTicker("Notification")
             .setVibrate(longArrayOf(100, 200, 300, 400, 500, 400, 300, 200, 400))
 
-
         val copyIntent = Intent(this, MainActivity::class.java)
-        copyIntent.action = "DISMISS"
+        copyIntent.action = "COPY"
         copyIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         val pendingCopyIntent = PendingIntent.getActivity(
             this, 0, copyIntent,
@@ -99,12 +136,9 @@ class MainService : AccessibilityService() {
         )
         val copyAction = NotificationCompat.Action(
             R.drawable.ic_baseline_notification_important_24,
-            "DISMISS", pendingCopyIntent
+            "COPY", pendingCopyIntent
         )
         builder.addAction(copyAction)
-
-
-
 
         val dismissIntent = Intent(this, MainActivity::class.java)
         dismissIntent.action = "DISMISS"
@@ -121,5 +155,16 @@ class MainService : AccessibilityService() {
 
         val notification = builder.build()
         notifyManager.notify(NOTIFY_ID, notification)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if(wm != null){
+            if(mView != null) {
+                wm!!.removeView(mView)
+                mView = null
+            }
+            wm = null
+        }
     }
 }
