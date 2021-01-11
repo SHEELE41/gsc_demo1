@@ -13,9 +13,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Gsc_demo1">
 
-        <service android:name=".service.MainService"
-            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
-            android:label="@string/accessibility_service_label">
+        <service
+            android:name=".service.MainService"
+            android:label="@string/accessibility_service_label"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>

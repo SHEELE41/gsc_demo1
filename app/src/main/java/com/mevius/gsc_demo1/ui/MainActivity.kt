@@ -14,7 +14,8 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity() {
-    private val ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE = 1;
+    private val actionManageOverlayPermissionRequestCode = 1;
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -25,7 +26,7 @@ class MainActivity : AppCompatActivity() {
                     Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                     Uri.parse("package:$packageName")
                 )
-                startActivityForResult(intent, ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE)
+                startActivityForResult(intent, actionManageOverlayPermissionRequestCode)
             } else {
                 startService(Intent(this@MainActivity, MainService::class.java))
             }
@@ -49,7 +50,7 @@ class MainActivity : AppCompatActivity() {
     @TargetApi(Build.VERSION_CODES.M)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE) {
+        if (requestCode == actionManageOverlayPermissionRequestCode) {
             if (!Settings.canDrawOverlays(this)) {
                 // TODO 동의를 얻지 못했을 경우의 처리
             } else {
